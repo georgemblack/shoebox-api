@@ -1,16 +1,16 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'build', '-t', 'us-east1-docker.pkg.dev/$PROJECT_ID/private/shoebox:$COMMIT_SHA', '.' ]
+    args: [ 'build', '-t', 'us-east1-docker.pkg.dev/$PROJECT_ID/private/shoebox-api:$COMMIT_SHA', '.' ]
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-east1-docker.pkg.dev/$PROJECT_ID/private/shoebox:$COMMIT_SHA']
+    args: ['push', 'us-east1-docker.pkg.dev/$PROJECT_ID/private/shoebox-api:$COMMIT_SHA']
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
     - 'run'
     - 'deploy'
-    - 'shoebox'
+    - 'shoebox-api'
     - '--image'
-    - 'us-east1-docker.pkg.dev/$PROJECT_ID/private/shoebox:$COMMIT_SHA'
+    - 'us-east1-docker.pkg.dev/$PROJECT_ID/private/shoebox-api:$COMMIT_SHA'
     - '--region'
     - 'us-east1'
     - '--concurrency'
@@ -22,6 +22,6 @@ steps:
     - '--platform'
     - 'managed'
     - '--service-account'
-    - 'shoebox-service@shoeboxweb.iam.gserviceaccount.com'
+    - 'shoebox-api-service@shoeboxweb.iam.gserviceaccount.com'
 images:
-  - 'us-east1-docker.pkg.dev/$PROJECT_ID/private/shoebox:$COMMIT_SHA'
+  - 'us-east1-docker.pkg.dev/$PROJECT_ID/private/shoebox-api:$COMMIT_SHA'

@@ -15,7 +15,7 @@ func main() {
 	port := getEnv("PORT", "9002")
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Bogus!"))
+		w.Write([]byte("Hello!"))
 	})
 
 	log.Println("Listening on " + port)
