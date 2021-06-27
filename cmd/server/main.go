@@ -52,11 +52,12 @@ func entryHandler(response http.ResponseWriter, request *http.Request) {
 }
 
 func main() {
-	shoebox.Init()
+	err := shoebox.Init()
+	if err != nil {
+		log.Fatalf("failed to initialize application; %v", err)
+	}
 	port := getEnv("PORT", "8080")
-
 	http.HandleFunc("/entries", entryHandler)
-
 	log.Println("Listening on " + port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

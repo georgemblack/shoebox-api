@@ -20,10 +20,13 @@ func decodeTextItem(raw map[string]interface{}) (TextItem, error) {
 
 	decoder, err := mapstructure.NewDecoder(config)
 	if err != nil {
-		return output, fmt.Errorf("failed to decode text item; %w", err)
+		return output, fmt.Errorf("failed to create decode config for text item; %w", err)
 	}
 
-	decoder.Decode(raw)
+	err = decoder.Decode(raw)
+	if err != nil {
+		return output, fmt.Errorf("failed to decode text item; %w", err)
+	}
 
 	if !stringSlicesEqual(metadata.Keys, expectedKeys) {
 		return output, fmt.Errorf("missing keys %v in %v", expectedKeys, metadata.Keys)
@@ -46,10 +49,13 @@ func decodeGeoPointItem(raw map[string]interface{}) (GeoPointItem, error) {
 
 	decoder, err := mapstructure.NewDecoder(config)
 	if err != nil {
-		return output, fmt.Errorf("failed to decode geopoint item; %w", err)
+		return output, fmt.Errorf("failed to create decode config for geopoint item; %w", err)
 	}
 
-	decoder.Decode(raw)
+	err = decoder.Decode(raw)
+	if err != nil {
+		return output, fmt.Errorf("failed to decode geopoint item; %w", err)
+	}
 
 	if !stringSlicesEqual(metadata.Keys, expectedKeys) {
 		return output, fmt.Errorf("missing keys %v in %v", expectedKeys, metadata.Keys)
