@@ -12,9 +12,13 @@ import (
 )
 
 func getEntries(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "howdy",
-	})
+	entries, err := shoebox.GetEntries()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to get entries"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"entries": entries.Entries})
 }
 
 func postEntry(c *gin.Context) {

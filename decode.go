@@ -1,9 +1,11 @@
 package shoebox
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/mitchellh/mapstructure"
+	"google.golang.org/genproto/googleapis/type/latlng"
 )
 
 func decodeTextItem(raw map[string]interface{}) (TextItem, error) {
@@ -61,5 +63,23 @@ func decodeGeoPointItem(raw map[string]interface{}) (GeoPointItem, error) {
 		return output, fmt.Errorf("missing keys %v in %v", expectedKeys, metadata.Keys)
 	}
 
+	return output, nil
+}
+
+func decodeGeoPointItemFromFirestore(raw map[string]interface{}) (GeoPointItem, error) {
+	output := GeoPointItem{}
+
+	geoPoint, ok := raw["geopoint"]
+	if !ok {
+		return GeoPointItem{}, errors.New("missing 'geopoint' field in firestore document")
+	}
+
+	parsedGeoPoint, ok := geoPoint.(*latlng.LatLng)
+	if !ok {
+		return GeoPointItem{}, errors.New("failed to parse 'geopoint' field as latlng.LatLng in firestore document")
+	}
+
+	output.Type = "geopoint"
+	output.GeoPoint = parsedGeoPoint
 	return output, nil
 }

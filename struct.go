@@ -6,6 +6,11 @@ import (
 	"google.golang.org/genproto/googleapis/type/latlng"
 )
 
+// Entries represents a list of entries
+type Entries struct {
+	Entries []Entry
+}
+
 // Entry represents a single entry
 type Entry struct {
 	Content   []interface{} `json:"content" firestore:"content"`
