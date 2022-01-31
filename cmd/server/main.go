@@ -8,47 +8,53 @@ import (
 	"os"
 
 	"github.com/georgemblack/shoebox"
+	"github.com/gin-gonic/gin"
 )
 
-func entryHandler(response http.ResponseWriter, request *http.Request) {
-	if request.Method == "POST" {
-		body, err := ioutil.ReadAll(request.Body)
-		if err != nil {
-			log.Println(err)
-			http.Error(response, "Bad request", http.StatusBadRequest)
-			return
-		}
-		var parsedBody map[string]interface{}
-		err = json.Unmarshal(body, &parsedBody)
-		if err != nil {
-			log.Println(err)
-			http.Error(response, "Bad request", http.StatusBadRequest)
-			return
-		}
-		entry, err := shoebox.ParseEntry(parsedBody)
-		if err != nil {
-			log.Println(err)
-			http.Error(response, "Bad request", http.StatusBadRequest)
-			return
-		}
-		err = shoebox.CreateEntry(entry)
-		if err != nil {
-			log.Println(err)
-			http.Error(response, "Internal error", http.StatusInternalServerError)
-			return
-		}
-		responseBody, err := json.Marshal(entry)
-		if err != nil {
-			log.Println(err)
-			http.Error(response, "Internal error", http.StatusInternalServerError)
-			return
-		}
-		response.Header().Set("Content-Type", "application/json")
-		_, err = response.Write(responseBody)
-		if err != nil {
-			log.Println(err)
-		}
+func getEntries(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"message": "howdy",
+	})
+}
+
+func postEntry(c *gin.Context) {
+	body, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "failed to read request body",
+		})
+		return
 	}
+	var parsedBody map[string]interface{}
+	err = json.Unmarshal(body, &parsedBody)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "failed to parse request body",
+		})
+		return
+	}
+	entry, err := shoebox.ParseEntry(parsedBody)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "failed to parse request body",
+		})
+		return
+	}
+	err = shoebox.CreateEntry(entry)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to create entry",
+		})
+		return
+	}
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "entry created",
+	})
 }
 
 func main() {
@@ -57,9 +63,10 @@ func main() {
 		log.Fatalf("failed to initialize application; %v", err)
 	}
 	port := getEnv("PORT", "8080")
-	http.HandleFunc("/entries", entryHandler)
-	log.Println("Listening on " + port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	router := gin.Default()
+	router.GET("/entries", getEntries)
+	router.POST("/entries", postEntry)
+	router.Run(":" + port)
 }
 
 func getEnv(key, fallback string) string {

@@ -6,4 +6,5 @@ RUN go build ./cmd/server/main.go
 FROM gcr.io/distroless/base-debian10
 WORKDIR /app
 COPY --from=build-env /go/src/app/main ./main
+ENV GIN_MODE=release
 CMD ["/app/main"]
