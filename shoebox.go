@@ -25,21 +25,21 @@ func Init() error {
 	return nil
 }
 
-func ParseEntry(raw map[string]interface{}) (Entry, error) {
+func ParseEntry(raw map[string]any) (Entry, error) {
 	entry := Entry{}
 
-	var content []interface{}
+	var content []any
 	rawContent, ok := raw["content"]
 	if !ok {
 		return entry, errors.New("missing 'content' in entry")
 	}
-	parsedContent, ok := rawContent.([]interface{})
+	parsedContent, ok := rawContent.([]any)
 	if !ok {
 		return entry, errors.New("'content' must be an array")
 	}
 
 	for _, rawItem := range parsedContent {
-		parsedItem, ok := rawItem.(map[string]interface{})
+		parsedItem, ok := rawItem.(map[string]any)
 		if !ok {
 			return entry, errors.New("item in 'content' must be a dictionary")
 		}
@@ -86,9 +86,9 @@ func CreateEntry(entry Entry) error {
 	return nil
 }
 
-func parseFirestoreDoc(raw map[string]interface{}) (Entry, error) {
+func parseFirestoreDoc(raw map[string]any) (Entry, error) {
 	entry := Entry{}
-	var content []interface{}
+	var content []any
 
 	// Parse published timestamp
 	_, ok := raw["published"]
@@ -115,13 +115,13 @@ func parseFirestoreDoc(raw map[string]interface{}) (Entry, error) {
 	if !ok {
 		return entry, errors.New("missing 'content' field in firestore document")
 	}
-	parsedContent, ok := raw["content"].([]interface{})
+	parsedContent, ok := raw["content"].([]any)
 	if !ok {
 		return entry, errors.New("'content' field must be an array")
 	}
 
 	for _, rawItem := range parsedContent {
-		parsedItem, ok := rawItem.(map[string]interface{})
+		parsedItem, ok := rawItem.(map[string]any)
 		if !ok {
 			return entry, errors.New("item in 'content' must be a dictionary")
 		}

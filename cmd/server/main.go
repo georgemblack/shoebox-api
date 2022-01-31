@@ -30,7 +30,7 @@ func postEntry(c *gin.Context) {
 		})
 		return
 	}
-	var parsedBody map[string]interface{}
+	var parsedBody map[string]any
 	err = json.Unmarshal(body, &parsedBody)
 	if err != nil {
 		log.Println(err)
