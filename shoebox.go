@@ -86,7 +86,7 @@ func CreateEntry(entry Entry) error {
 	return nil
 }
 
-func parseFirestoreDoc(raw map[string]any) (Entry, error) {
+func parseFirestoreDoc(ID string, raw map[string]any) (Entry, error) {
 	entry := Entry{}
 	var content []any
 
@@ -154,6 +154,7 @@ func parseFirestoreDoc(raw map[string]any) (Entry, error) {
 		}
 	}
 
+	entry.ID = ID
 	entry.Published = published
 	entry.Updated = updated
 	entry.Content = content
@@ -177,7 +178,7 @@ func GetEntries() (Entries, error) {
 			return Entries{}, fmt.Errorf("failed to iterate over firestore documents; %w", err)
 		}
 
-		entry, err := parseFirestoreDoc(doc.Data())
+		entry, err := parseFirestoreDoc(doc.Ref.ID, doc.Data())
 		if err != nil {
 			fmt.Println(err)
 		}

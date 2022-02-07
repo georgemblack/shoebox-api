@@ -11,6 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func getOptions(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+}
+
 func getEntries(c *gin.Context) {
 	entries, err := shoebox.GetEntries()
 	if err != nil {
@@ -18,6 +24,10 @@ func getEntries(c *gin.Context) {
 		return
 	}
 
+	
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	c.JSON(http.StatusOK, gin.H{"entries": entries.Entries})
 }
 
@@ -70,6 +80,7 @@ func main() {
 	router := gin.Default()
 	router.GET("/entries", getEntries)
 	router.POST("/entries", postEntry)
+	router.OPTIONS("/entries" , getOptions)
 	router.Run(":" + port)
 }
 
