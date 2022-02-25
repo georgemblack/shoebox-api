@@ -24,7 +24,6 @@ func getEntries(c *gin.Context) {
 		return
 	}
 
-	
 	c.Header("Access-Control-Allow-Origin", "*")
 	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 	c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
@@ -78,9 +77,9 @@ func main() {
 	}
 	port := getEnv("PORT", "8080")
 	router := gin.Default()
-	router.GET("/entries", getEntries)
-	router.POST("/entries", postEntry)
-	router.OPTIONS("/entries" , getOptions)
+	router.GET("/api/entries", getEntries)
+	router.POST("/api/entries", postEntry)
+	router.OPTIONS("/api/entries", getOptions)
 	router.Run(":" + port)
 }
 
