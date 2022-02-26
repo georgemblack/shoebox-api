@@ -18,6 +18,7 @@ func main() {
 	port := getEnv("PORT", "8080")
 	router := gin.Default()
 
+	router.Use(handlers.PreflightHandler)
 	router.GET("/api/entries", handlers.GetEntriesHandler)
 	router.POST("/api/entries", handlers.PostEntryHandler)
 	router.Run(":" + port)

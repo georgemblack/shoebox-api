@@ -23,12 +23,25 @@ func newErrorResponse(message string) errorResponse {
 	}
 }
 
+func PreflightHandler(c *gin.Context) {
+	if c.Request.Method == "OPTIONS" {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		c.AbortWithStatus(http.StatusOK)
+		return
+	}
+	c.Next()
+}
+
 func GetEntriesHandler(c *gin.Context) {
 	entries, err := shoebox.GetEntries()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, newErrorResponse("failed to get entries"))
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"entries": entries.Entries})
 }
 
