@@ -13,10 +13,10 @@ type Entries struct {
 
 // Entry represents a single entry
 type Entry struct {
-	ID        string    `json:"id"`
-	Content   []any     `json:"content" firestore:"content"`
-	Published time.Time `json:"published" firestore:"published"`
-	Updated   time.Time `json:"updated" firestore:"updated"`
+	ID        string        `json:"id"`
+	Content   []interface{} `json:"content" firestore:"content"`
+	Published time.Time     `json:"published" firestore:"published"`
+	Updated   time.Time     `json:"updated" firestore:"updated"`
 }
 
 // TextItem represents text

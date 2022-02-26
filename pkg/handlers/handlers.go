@@ -52,7 +52,7 @@ func PostEntryHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, newErrorResponse("failed to read request body"))
 		return
 	}
-	var parsedBody map[string]any
+	var parsedBody map[string]interface{}
 	err = json.Unmarshal(body, &parsedBody)
 	if err != nil {
 		log.Println(err)

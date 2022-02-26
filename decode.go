@@ -8,7 +8,7 @@ import (
 	"google.golang.org/genproto/googleapis/type/latlng"
 )
 
-func decodeTextItem(raw map[string]any) (TextItem, error) {
+func decodeTextItem(raw map[string]interface{}) (TextItem, error) {
 	expectedKeys := []string{"type", "text"}
 
 	var metadata mapstructure.Metadata
@@ -37,7 +37,7 @@ func decodeTextItem(raw map[string]any) (TextItem, error) {
 	return output, nil
 }
 
-func decodeGeoPointItem(raw map[string]any) (GeoPointItem, error) {
+func decodeGeoPointItem(raw map[string]interface{}) (GeoPointItem, error) {
 	expectedKeys := []string{"type", "geopoint", "geopoint.latitude", "geopoint.longitude"}
 
 	var metadata mapstructure.Metadata
@@ -66,7 +66,7 @@ func decodeGeoPointItem(raw map[string]any) (GeoPointItem, error) {
 	return output, nil
 }
 
-func decodeGeoPointItemFromFirestore(raw map[string]any) (GeoPointItem, error) {
+func decodeGeoPointItemFromFirestore(raw map[string]interface{}) (GeoPointItem, error) {
 	output := GeoPointItem{}
 
 	geoPoint, ok := raw["geopoint"]
