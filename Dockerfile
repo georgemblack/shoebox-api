@@ -7,4 +7,5 @@ FROM gcr.io/distroless/base-debian10
 WORKDIR /app
 COPY --from=build-env /go/src/app/main ./main
 ENV GIN_MODE=release
+ENV ENVIRONMENT=production
 CMD ["/app/main"]

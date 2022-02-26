@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/georgemblack/shoebox"
+	"github.com/georgemblack/shoebox/pkg/config"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,16 +24,16 @@ func newErrorResponse(message string) errorResponse {
 	}
 }
 
-func PreflightHandler(c *gin.Context) {
-	if c.Request.Method == "OPTIONS" {
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		c.Header("Access-Control-Allow-Credentials", "true")
-		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		c.AbortWithStatus(http.StatusOK)
-		return
+func PreflightHandler(config config.Config) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		if config.AddCORSHeaders {
+			c.Header("Access-Control-Allow-Origin", "*")
+			c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+			c.Header("Access-Control-Allow-Credentials", "true")
+			c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		}
+		c.Next()
 	}
-	c.Next()
 }
 
 func GetEntriesHandler(c *gin.Context) {
