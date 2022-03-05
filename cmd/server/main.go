@@ -31,5 +31,7 @@ func main() {
 	router.Use(handlers.PreflightHandler(config))
 	router.GET("/api/entries", handlers.GetEntriesHandler)
 	router.POST("/api/entries", handlers.PostEntryHandler)
+	router.DELETE("/api/entries/:entry_id", handlers.DeleteEntryHandler)
+
 	router.Run(":" + config.APIPort)
 }

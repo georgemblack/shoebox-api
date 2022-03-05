@@ -9,6 +9,7 @@ import (
 
 	"github.com/georgemblack/shoebox"
 	"github.com/georgemblack/shoebox/pkg/config"
+	"github.com/georgemblack/shoebox/pkg/firestore"
 	"github.com/gin-gonic/gin"
 )
 
@@ -75,4 +76,15 @@ func PostEntryHandler(c *gin.Context) {
 
 	c.Header("Content-Type", "application/json")
 	c.Status(http.StatusCreated)
+}
+
+func DeleteEntryHandler(c *gin.Context) {
+	id := c.Param("entry_id")
+	err := firestore.DeleteEntry(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, newErrorResponse(err.Error()))
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
