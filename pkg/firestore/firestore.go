@@ -3,29 +3,39 @@ package firestore
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"cloud.google.com/go/firestore"
+	"github.com/georgemblack/shoebox/pkg/config"
 )
 
-var client *firestore.Client
-
-func GetFirestoreClient() *firestore.Client {
-	if client != nil {
-		return client
-	}
-	firestoreClient, err := firestore.NewClient(context.Background(), "shoeboxweb")
-	if err != nil {
-		log.Fatal(fmt.Errorf("failed to initialize firestore client; %w", err))
-	}
-	client = firestoreClient
-	return client
+type Datastore interface {
+	DeleteEntry(ID string) error
 }
 
-func DeleteEntry(ID string) error {
+type datastoreClient struct {
+	realClient     *firestore.Client
+	collectionName string
+}
+
+func GetDatastoreClient(config config.Config) (Datastore, error) {
+	var client datastoreClient
+
+	// Initialize Firestore client
+	firestoreClient, err := firestore.NewClient(context.Background(), config.FirestoreProjectID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create firestore client; %w", err)
+	}
+	client.realClient = firestoreClient
+
+	// Set config values
+	client.collectionName = config.FirestoreCollectionName
+
+	return client, nil
+}
+
+func (client datastoreClient) DeleteEntry(ID string) error {
 	ctx := context.Background()
-	client := GetFirestoreClient()
-	doc, err := client.Doc("shoebox-entries/" + ID).Get(ctx)
+	doc, err := client.realClient.Doc(client.collectionName + "/" + ID).Get(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to retrieve document; %w", err)
 	}

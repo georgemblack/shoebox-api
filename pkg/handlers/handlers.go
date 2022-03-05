@@ -78,13 +78,15 @@ func PostEntryHandler(c *gin.Context) {
 	c.Status(http.StatusCreated)
 }
 
-func DeleteEntryHandler(c *gin.Context) {
-	id := c.Param("entry_id")
-	err := firestore.DeleteEntry(id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, newErrorResponse(err.Error()))
-		return
-	}
+func DeleteEntryHandler(firestore firestore.Datastore) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		entryID := c.Param("entry_id")
+		err := firestore.DeleteEntry(entryID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, newErrorResponse(err.Error()))
+			return
+		}
 
-	c.Status(http.StatusNoContent)
+		c.Status(http.StatusNoContent)
+	}
 }

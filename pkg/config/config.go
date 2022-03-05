@@ -9,8 +9,10 @@ import (
 )
 
 type Config struct {
-	APIPort        string `json:"apiPort"`
-	AddCORSHeaders bool   `json:"addCORSHeaders"`
+	APIPort                 string `json:"apiPort"`
+	AddCORSHeaders          bool   `json:"addCORSHeaders"`
+	FirestoreProjectID      string `json:"firestoreProjectID"`
+	FirestoreCollectionName string `json:"firestoreCollectionName"`
 }
 
 func LoadConfig(configFiles fs.FS) (Config, error) {
