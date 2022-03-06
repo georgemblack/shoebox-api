@@ -32,11 +32,11 @@ func main() {
 
 	api.Use(handlers.PreflightHandler(config))
 	api.OPTIONS("/*path", handlers.OptionsHanlder)
-	api.GET("/api/entries", handlers.GetEntriesHandler(datastore))
-	api.POST("/api/entries", handlers.PostEntryHandler(datastore))
-	api.GET("/api/entries/:entry_id", handlers.GetEntryHandler(datastore))
-	api.PUT("/api/entries/:entry_id", handlers.PutEntryHandler(datastore))
-	api.DELETE("/api/entries/:entry_id", handlers.DeleteEntryHandler(datastore))
+	api.GET("/entries", handlers.GetEntriesHandler(datastore))
+	api.POST("/entries", handlers.PostEntryHandler(datastore))
+	api.GET("/entries/:entry_id", handlers.GetEntryHandler(datastore))
+	api.PUT("/entries/:entry_id", handlers.PutEntryHandler(datastore))
+	api.DELETE("/entries/:entry_id", handlers.DeleteEntryHandler(datastore))
 
 	router.Run(":" + config.APIPort)
 }
