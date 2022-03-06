@@ -45,6 +45,19 @@ func GetEntriesHandler(firestore firestore.Datastore) gin.HandlerFunc {
 	}
 }
 
+func GetEntryHandler(firestore firestore.Datastore) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		entryID := c.Param("entry_id")
+		entry, err := firestore.GetEntry(entryID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, newErrorResponse(err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, entry)
+	}
+}
+
 func PostEntryHandler(firestore firestore.Datastore) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var entry types.Entry

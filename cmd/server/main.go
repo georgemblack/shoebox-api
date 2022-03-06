@@ -32,6 +32,7 @@ func main() {
 	router.Use(handlers.PreflightHandler(config))
 	router.GET("/api/entries", handlers.GetEntriesHandler(datastore))
 	router.POST("/api/entries", handlers.PostEntryHandler(datastore))
+	router.GET("/api/entries/:entry_id", handlers.GetEntryHandler(datastore))
 	router.PUT("/api/entries/:entry_id", handlers.PutEntryHandler(datastore))
 	router.DELETE("/api/entries/:entry_id", handlers.DeleteEntryHandler(datastore))
 
