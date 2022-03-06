@@ -56,8 +56,9 @@ func PostEntryHandler(firestore firestore.Datastore) gin.HandlerFunc {
 		}
 
 		entry.ID = uuid.New().String()
-		entry.Created = time.Now()
-		entry.Updated = time.Now()
+		now := time.Now()
+		entry.Created = now
+		entry.Updated = now
 
 		err = firestore.CreateEntry(entry)
 		if err != nil {
@@ -73,17 +74,20 @@ func PutEntryHandler(firestore firestore.Datastore) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		entryID := c.Param("entry_id")
 
-		var entry types.Entry
-
-		err := c.BindJSON(&entry)
+		var newEntry types.Entry
+		err := c.BindJSON(&newEntry)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, newErrorResponse(err.Error()))
 			return
 		}
 
-		entry.ID = entryID
-		entry.Updated = time.Now()
+		oldEntry, err := firestore.GetEntry(entryID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, newErrorResponse(err.Error()))
+			return
+		}
 
+		entry := types.MergeEntries(oldEntry, newEntry)
 		err = firestore.CreateEntry(entry)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, newErrorResponse(err.Error()))

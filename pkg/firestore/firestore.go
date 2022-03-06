@@ -12,6 +12,7 @@ import (
 
 type Datastore interface {
 	GetEntries() ([]types.Entry, error)
+	GetEntry(ID string) (types.Entry, error)
 	CreateEntry(entry types.Entry) error
 	DeleteEntry(ID string) error
 }
@@ -64,6 +65,24 @@ func (client datastoreClient) GetEntries() ([]types.Entry, error) {
 	}
 
 	return entries, nil
+}
+
+func (client datastoreClient) GetEntry(ID string) (types.Entry, error) {
+	ctx := context.Background()
+
+	doc, err := client.realClient.Doc(client.collectionName + "/" + ID).Get(ctx)
+	if err != nil {
+		return types.Entry{}, fmt.Errorf("failed to retrieve document; %w", err)
+	}
+
+	var entry types.Entry
+	err = doc.DataTo(&entry)
+	if err != nil {
+		return types.Entry{}, fmt.Errorf("failed to parse document; %w", err)
+	}
+
+	entry.ID = doc.Ref.ID
+	return entry, nil
 }
 
 func (client datastoreClient) CreateEntry(entry types.Entry) error {

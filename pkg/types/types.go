@@ -13,3 +13,14 @@ type Entry struct {
 	Created  time.Time      `json:"created" firestore:"created"`
 	Updated  time.Time      `json:"updated" firestore:"updated"`
 }
+
+func MergeEntries(old Entry, new Entry) Entry {
+	if new.Text != "" {
+		old.Text = new.Text
+	}
+	if new.GeoPoint != nil {
+		old.GeoPoint = new.GeoPoint
+	}
+	old.Updated = time.Now()
+	return old
+}
