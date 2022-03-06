@@ -1,16 +1,14 @@
 package handlers
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 
-	"github.com/georgemblack/shoebox"
 	"github.com/georgemblack/shoebox/pkg/config"
 	"github.com/georgemblack/shoebox/pkg/firestore"
+	"github.com/georgemblack/shoebox/pkg/types"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type errorResponse struct {
@@ -25,57 +23,75 @@ func newErrorResponse(message string) errorResponse {
 	}
 }
 
-func PreflightHandler(config config.Config) func(c *gin.Context) {
+func PreflightHandler(config config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if config.AddCORSHeaders {
 			c.Header("Access-Control-Allow-Origin", "*")
-			c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-			c.Header("Access-Control-Allow-Credentials", "true")
-			c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			c.Header("Access-Control-Allow-Methods", "*")
 		}
 		c.Next()
 	}
 }
 
-func GetEntriesHandler(c *gin.Context) {
-	entries, err := shoebox.GetEntries()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, newErrorResponse("failed to get entries"))
-		return
-	}
+func GetEntriesHandler(firestore firestore.Datastore) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		entries, err := firestore.GetEntries()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, newErrorResponse(err.Error()))
+			return
+		}
 
-	c.JSON(http.StatusOK, gin.H{"entries": entries.Entries})
+		c.JSON(http.StatusOK, gin.H{"entries": entries})
+	}
 }
 
-func PostEntryHandler(c *gin.Context) {
-	body, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusBadRequest, newErrorResponse("failed to read request body"))
-		return
-	}
-	var parsedBody map[string]interface{}
-	err = json.Unmarshal(body, &parsedBody)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusBadRequest, newErrorResponse("failed to parse request body"))
-		return
-	}
-	entry, err := shoebox.ParseEntry(parsedBody)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusBadRequest, newErrorResponse("failed to parse request body"))
-		return
-	}
-	err = shoebox.CreateEntry(entry)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, newErrorResponse("failed to create entry"))
-		return
-	}
+func PostEntryHandler(firestore firestore.Datastore) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var entry types.Entry
 
-	c.Header("Content-Type", "application/json")
-	c.Status(http.StatusCreated)
+		err := c.BindJSON(&entry)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, newErrorResponse(err.Error()))
+			return
+		}
+
+		entry.ID = uuid.New().String()
+		entry.Created = time.Now()
+		entry.Updated = time.Now()
+
+		err = firestore.CreateEntry(entry)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, newErrorResponse(err.Error()))
+			return
+		}
+
+		c.Status(http.StatusCreated)
+	}
+}
+
+func PutEntryHandler(firestore firestore.Datastore) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		entryID := c.Param("entry_id")
+
+		var entry types.Entry
+
+		err := c.BindJSON(&entry)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, newErrorResponse(err.Error()))
+			return
+		}
+
+		entry.ID = entryID
+		entry.Updated = time.Now()
+
+		err = firestore.CreateEntry(entry)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, newErrorResponse(err.Error()))
+			return
+		}
+
+		c.Status(http.StatusNoContent)
+	}
 }
 
 func DeleteEntryHandler(firestore firestore.Datastore) gin.HandlerFunc {

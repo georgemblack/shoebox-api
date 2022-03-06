@@ -2,5 +2,5 @@
   "apiPort": "8080",
   "addCORSHeaders": true,
   "firestoreProjectID": "shoeboxweb",
-  "firestoreCollectionName": "shoebox-entries-test"
+  "firestoreCollectionName": "shoebox-notes-test"
 }
