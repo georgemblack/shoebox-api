@@ -28,9 +28,15 @@ func PreflightHandler(config config.Config) gin.HandlerFunc {
 		if config.AddCORSHeaders {
 			c.Header("Access-Control-Allow-Origin", "*")
 			c.Header("Access-Control-Allow-Methods", "*")
+			c.Header("Access-Control-Allow-Credentials", "true")
+			c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		}
 		c.Next()
 	}
+}
+
+func OptionsHanlder(c *gin.Context) {
+	c.Status(http.StatusOK)
 }
 
 func GetEntriesHandler(firestore firestore.Datastore) gin.HandlerFunc {

@@ -28,13 +28,15 @@ func main() {
 	}
 
 	router := gin.Default()
+	api := router.Group("/api")
 
-	router.Use(handlers.PreflightHandler(config))
-	router.GET("/api/entries", handlers.GetEntriesHandler(datastore))
-	router.POST("/api/entries", handlers.PostEntryHandler(datastore))
-	router.GET("/api/entries/:entry_id", handlers.GetEntryHandler(datastore))
-	router.PUT("/api/entries/:entry_id", handlers.PutEntryHandler(datastore))
-	router.DELETE("/api/entries/:entry_id", handlers.DeleteEntryHandler(datastore))
+	api.Use(handlers.PreflightHandler(config))
+	api.OPTIONS("/*path", handlers.OptionsHanlder)
+	api.GET("/api/entries", handlers.GetEntriesHandler(datastore))
+	api.POST("/api/entries", handlers.PostEntryHandler(datastore))
+	api.GET("/api/entries/:entry_id", handlers.GetEntryHandler(datastore))
+	api.PUT("/api/entries/:entry_id", handlers.PutEntryHandler(datastore))
+	api.DELETE("/api/entries/:entry_id", handlers.DeleteEntryHandler(datastore))
 
 	router.Run(":" + config.APIPort)
 }
